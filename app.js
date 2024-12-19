@@ -73,7 +73,11 @@ mongoose.connect(dbPort).then((res) => {
 
 const routes = require("./src/routes/api");
 
-app.use("/api/v1", routes)
+app.use("/api/v1", routes);
+
+app.get("",async (req, res) => {
+    res.send("Server running");
+})
 
 
 
