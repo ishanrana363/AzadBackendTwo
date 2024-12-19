@@ -52,27 +52,29 @@ const userProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
+    const saltRounds = 10;
+
     try {
-        const { name, password, img, number } = req.body;
-        const id = req.headers._id
-        console.log("id is", password)
+        const id = req.headers._id;
+        const { password, img, number, name } = req.body;
         const filter = {
             _id: id,
         };
-        const update = {
-            name,
-            password,
-            img,
-            number,
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        const updateData = {
+            password: hashedPassword,
+            img: img,
+            number: number,
+            name: name,
         }
-
-        const user = await userModel.findOneAndUpdate(filter, { $set: update }, { upsert: true });
-        if (!user) return errorResponse(res, 404, "User not found", null);
-        return successResponse(res, 200, "User profile updated successfully", user);
+        const updatedUser = await userModel.findOneAndUpdate(filter, updateData, { new: true });
+        if (!updatedUser) return errorResponse(res, 404, "User not found", null);
+        return successResponse(res, 200, "User profile updated successfully", updatedUser);
     } catch (error) {
-        console.error(error);
-        return errorResponse(res, 500, "Something went wrong", error);
+        errorResponse(res, 500, "Something went wrong", error);
     }
+
 };
 
 
