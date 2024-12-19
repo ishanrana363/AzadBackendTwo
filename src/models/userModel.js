@@ -1,31 +1,57 @@
 const mongoose = require('mongoose');
-const {Schema,model} = mongoose;
+const { Schema, model } = mongoose;
 const bcrypt = require('bcrypt');
 
 const userSchema = new Schema({
-    email : {
+    email: {
         type: String,
         required: true,
         unique: true
     },
-    number : {
+    number: {
         type: String,
         required: true,
         unique: true
     },
-    name : {
+    name: {
         type: String,
     },
-    password : {
+    password: {
         type: String,
-        set : (v)=> bcrypt.hashSync(v,bcrypt.genSaltSync(10)),
         required: true
     },
-    img : {
+    img: {
         type: String,
     }
-},{timestamps:true,versionKey:false});
+}, { timestamps: true, versionKey: false });
 
-const userModel = model("users",userSchema);
+/**
+ * @desc Pre-save hook to hash the password before saving the user document
+ */
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * @desc Method to compare provided password with the stored hashed password
+ */
+userSchema.methods.comparePassword = async function (inputPassword) {
+    try {
+        return await bcrypt.compare(inputPassword, this.password);
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+const userModel = model("users", userSchema);
 
 module.exports = userModel;

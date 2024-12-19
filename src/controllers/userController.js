@@ -66,7 +66,7 @@ const updateProfile = async (req, res) => {
             number,
         }
 
-        const user = await userModel.findOneAndUpdate(filter, update, { new: true });
+        const user = await userModel.findOneAndUpdate(filter, { $set: update }, { upsert: true });
         if (!user) return errorResponse(res, 404, "User not found", null);
         return successResponse(res, 200, "User profile updated successfully", user);
     } catch (error) {
