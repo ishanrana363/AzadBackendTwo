@@ -29,6 +29,7 @@ const isLogIn = (req, res, next) => {
 
 
         let _id = decode.user._id;
+        
         req.headers._id = _id;
         let email = decode.user.email;
         req.headers.email = email;
