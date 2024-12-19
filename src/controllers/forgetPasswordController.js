@@ -73,9 +73,9 @@ exports.verifyOtp = async (req, res) => {
 exports.resetPassword = async (req, res) => {
     const { password, email, otp } = req.body;
 
-    const statusUpdate = 0; // Resets OTP status to 0 (used)
-    const otpCode = 0; // Resets OTP code to 0 (invalidates the OTP)
-    const saltRounds = 10; // Bcrypt salt rounds
+    const statusUpdate = 0; 
+    const otpCode = 0; 
+    const saltRounds = 10; 
 
     try {
         // 1️⃣ Validate input data
