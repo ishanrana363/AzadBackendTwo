@@ -6,6 +6,7 @@ const userConroller = require("../controllers/userController");
 
 
 router.post("/user-create", userConroller.createUser);
+router.post("/user-login", userConroller.loginUser);
 
 
 

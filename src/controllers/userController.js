@@ -1,5 +1,7 @@
+const { tokenCreate } = require("../helpers/tokenHelper");
 const userModel = require("../models/userModel");
 const { successResponse, errorResponse } = require("../utility/response");
+const bcrypt = require("bcrypt");
 
 const createUser = async (req, res) => {
     try {
@@ -19,6 +21,23 @@ const createUser = async (req, res) => {
 };
 
 
+const loginUser = async (req, res) => {
+    try {
+        const {email,password} = req.body;
+        const user = await userModel.findOne({email: email});
+        if(!user) return errorResponse(res,404,"User not found",null);
+        let matchPassword = bcrypt.compareSync(password, user.password);;
+        if(!matchPassword) return errorResponse(res,400,"Invalid credentials",null);
+        const token = tokenCreate({user}, process.env.JWT_KEY, "10d" );
+        return successResponse(res,200,"Logged in successfully",{user,token});
+    } catch (error) {
+        console.log(error)
+        errorResponse(res,500,"Something went wrong",error);
+    }
+};
+
+
 module.exports = {
     createUser,
+    loginUser
 };
